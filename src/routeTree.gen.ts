@@ -10,33 +10,343 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AwaitingPaymentRouteImport } from './routes/awaiting-payment'
+import { Route as ContactsRouteImport } from './routes/contacts'
+import { Route as ConversationsRouteImport } from './routes/conversations'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OffersRouteImport } from './routes/offers'
+import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as ProductsRouteImport } from './routes/products'
+import { Route as PublishedRouteImport } from './routes/published'
+import { Route as ShippingRouteImport } from './routes/shipping'
+import { Route as TeamRouteImport } from './routes/team'
+import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as ApiChatAiRouteImport } from './routes/api/chat-ai'
+import { Route as ApiVisitorRouteImport } from './routes/api/visitor'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as CSlugRouteImport } from './routes/c.$slug'
+import { Route as ChatSlugRouteImport } from './routes/chat.$slug'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
+import { Route as SettingsPaymentMethodsRouteImport } from './routes/settings.payment-methods'
+import { Route as TeamJoinRouteImport } from './routes/team.join'
+import { Route as CSlugIndexRouteImport } from './routes/c.$slug.index'
+import { Route as CSlugAccountRouteImport } from './routes/c.$slug.account'
+import { Route as CSlugTrackRouteImport } from './routes/c.$slug.track'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AwaitingPaymentRoute = AwaitingPaymentRouteImport.update({
+  id: '/awaiting-payment',
+  path: '/awaiting-payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactsRoute = ContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConversationsRoute = ConversationsRouteImport.update({
+  id: '/conversations',
+  path: '/conversations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OffersRoute = OffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublishedRoute = PublishedRouteImport.update({
+  id: '/published',
+  path: '/published',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatAiRoute = ApiChatAiRouteImport.update({
+  id: '/api/chat-ai',
+  path: '/api/chat-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVisitorRoute = ApiVisitorRouteImport.update({
+  id: '/api/visitor',
+  path: '/api/visitor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CSlugRoute = CSlugRouteImport.update({
+  id: '/c/$slug',
+  path: '/c/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatSlugRoute = ChatSlugRouteImport.update({
+  id: '/chat/$slug',
+  path: '/chat/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/settings/notifications',
+  path: '/settings/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsPaymentMethodsRoute = SettingsPaymentMethodsRouteImport.update({
+  id: '/settings/payment-methods',
+  path: '/settings/payment-methods',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamJoinRoute = TeamJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => TeamRoute,
+} as any)
+const CSlugIndexRoute = CSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CSlugRoute,
+} as any)
+const CSlugAccountRoute = CSlugAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => CSlugRoute,
+} as any)
+const CSlugTrackRoute = CSlugTrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => CSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/awaiting-payment': typeof AwaitingPaymentRoute
+  '/contacts': typeof ContactsRoute
+  '/conversations': typeof ConversationsRoute
+  '/dashboard': typeof DashboardRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/offers': typeof OffersRoute
+  '/orders': typeof OrdersRoute
+  '/products': typeof ProductsRoute
+  '/published': typeof PublishedRoute
+  '/shipping': typeof ShippingRoute
+  '/team': typeof TeamRouteWithChildren
+  '/welcome': typeof WelcomeRoute
+  '/api/chat-ai': typeof ApiChatAiRoute
+  '/api/visitor': typeof ApiVisitorRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/c/$slug': typeof CSlugRouteWithChildren
+  '/chat/$slug': typeof ChatSlugRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
+  '/team/join': typeof TeamJoinRoute
+  '/c/$slug/account': typeof CSlugAccountRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
+  '/c/$slug/': typeof CSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/awaiting-payment': typeof AwaitingPaymentRoute
+  '/contacts': typeof ContactsRoute
+  '/conversations': typeof ConversationsRoute
+  '/dashboard': typeof DashboardRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/offers': typeof OffersRoute
+  '/orders': typeof OrdersRoute
+  '/products': typeof ProductsRoute
+  '/published': typeof PublishedRoute
+  '/shipping': typeof ShippingRoute
+  '/team': typeof TeamRouteWithChildren
+  '/welcome': typeof WelcomeRoute
+  '/api/chat-ai': typeof ApiChatAiRoute
+  '/api/visitor': typeof ApiVisitorRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/chat/$slug': typeof ChatSlugRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
+  '/team/join': typeof TeamJoinRoute
+  '/c/$slug/account': typeof CSlugAccountRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
+  '/c/$slug': typeof CSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/awaiting-payment': typeof AwaitingPaymentRoute
+  '/contacts': typeof ContactsRoute
+  '/conversations': typeof ConversationsRoute
+  '/dashboard': typeof DashboardRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/offers': typeof OffersRoute
+  '/orders': typeof OrdersRoute
+  '/products': typeof ProductsRoute
+  '/published': typeof PublishedRoute
+  '/shipping': typeof ShippingRoute
+  '/team': typeof TeamRouteWithChildren
+  '/welcome': typeof WelcomeRoute
+  '/api/chat-ai': typeof ApiChatAiRoute
+  '/api/visitor': typeof ApiVisitorRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/c/$slug': typeof CSlugRouteWithChildren
+  '/chat/$slug': typeof ChatSlugRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
+  '/team/join': typeof TeamJoinRoute
+  '/c/$slug/account': typeof CSlugAccountRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
+  '/c/$slug/': typeof CSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/awaiting-payment'
+    | '/contacts'
+    | '/conversations'
+    | '/dashboard'
+    | '/join'
+    | '/login'
+    | '/offers'
+    | '/orders'
+    | '/products'
+    | '/published'
+    | '/shipping'
+    | '/team'
+    | '/welcome'
+    | '/api/chat-ai'
+    | '/api/visitor'
+    | '/auth/callback'
+    | '/c/$slug'
+    | '/chat/$slug'
+    | '/settings/notifications'
+    | '/settings/payment-methods'
+    | '/team/join'
+    | '/c/$slug/account'
+    | '/c/$slug/track'
+    | '/c/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/awaiting-payment'
+    | '/contacts'
+    | '/conversations'
+    | '/dashboard'
+    | '/join'
+    | '/login'
+    | '/offers'
+    | '/orders'
+    | '/products'
+    | '/published'
+    | '/shipping'
+    | '/team'
+    | '/welcome'
+    | '/api/chat-ai'
+    | '/api/visitor'
+    | '/auth/callback'
+    | '/chat/$slug'
+    | '/settings/notifications'
+    | '/settings/payment-methods'
+    | '/team/join'
+    | '/c/$slug/account'
+    | '/c/$slug/track'
+    | '/c/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/awaiting-payment'
+    | '/contacts'
+    | '/conversations'
+    | '/dashboard'
+    | '/join'
+    | '/login'
+    | '/offers'
+    | '/orders'
+    | '/products'
+    | '/published'
+    | '/shipping'
+    | '/team'
+    | '/welcome'
+    | '/api/chat-ai'
+    | '/api/visitor'
+    | '/auth/callback'
+    | '/c/$slug'
+    | '/chat/$slug'
+    | '/settings/notifications'
+    | '/settings/payment-methods'
+    | '/team/join'
+    | '/c/$slug/account'
+    | '/c/$slug/track'
+    | '/c/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AwaitingPaymentRoute: typeof AwaitingPaymentRoute
+  ContactsRoute: typeof ContactsRoute
+  ConversationsRoute: typeof ConversationsRoute
+  DashboardRoute: typeof DashboardRoute
+  JoinRoute: typeof JoinRoute
+  LoginRoute: typeof LoginRoute
+  OffersRoute: typeof OffersRoute
+  OrdersRoute: typeof OrdersRoute
+  ProductsRoute: typeof ProductsRoute
+  PublishedRoute: typeof PublishedRoute
+  ShippingRoute: typeof ShippingRoute
+  TeamRoute: typeof TeamRouteWithChildren
+  WelcomeRoute: typeof WelcomeRoute
+  ApiChatAiRoute: typeof ApiChatAiRoute
+  ApiVisitorRoute: typeof ApiVisitorRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  CSlugRoute: typeof CSlugRouteWithChildren
+  ChatSlugRoute: typeof ChatSlugRoute
+  SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsPaymentMethodsRoute: typeof SettingsPaymentMethodsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +358,223 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/awaiting-payment': {
+      id: '/awaiting-payment'
+      path: '/awaiting-payment'
+      fullPath: '/awaiting-payment'
+      preLoaderRoute: typeof AwaitingPaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacts': {
+      id: '/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conversations': {
+      id: '/conversations'
+      path: '/conversations'
+      fullPath: '/conversations'
+      preLoaderRoute: typeof ConversationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offers': {
+      id: '/offers'
+      path: '/offers'
+      fullPath: '/offers'
+      preLoaderRoute: typeof OffersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/published': {
+      id: '/published'
+      path: '/published'
+      fullPath: '/published'
+      preLoaderRoute: typeof PublishedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat-ai': {
+      id: '/api/chat-ai'
+      path: '/api/chat-ai'
+      fullPath: '/api/chat-ai'
+      preLoaderRoute: typeof ApiChatAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/visitor': {
+      id: '/api/visitor'
+      path: '/api/visitor'
+      fullPath: '/api/visitor'
+      preLoaderRoute: typeof ApiVisitorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$slug': {
+      id: '/c/$slug'
+      path: '/c/$slug'
+      fullPath: '/c/$slug'
+      preLoaderRoute: typeof CSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat/$slug': {
+      id: '/chat/$slug'
+      path: '/chat/$slug'
+      fullPath: '/chat/$slug'
+      preLoaderRoute: typeof ChatSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/settings/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/payment-methods': {
+      id: '/settings/payment-methods'
+      path: '/settings/payment-methods'
+      fullPath: '/settings/payment-methods'
+      preLoaderRoute: typeof SettingsPaymentMethodsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team/join': {
+      id: '/team/join'
+      path: '/join'
+      fullPath: '/team/join'
+      preLoaderRoute: typeof TeamJoinRouteImport
+      parentRoute: typeof TeamRoute
+    }
+    '/c/$slug/': {
+      id: '/c/$slug/'
+      path: '/'
+      fullPath: '/c/$slug/'
+      preLoaderRoute: typeof CSlugIndexRouteImport
+      parentRoute: typeof CSlugRoute
+    }
+    '/c/$slug/account': {
+      id: '/c/$slug/account'
+      path: '/account'
+      fullPath: '/c/$slug/account'
+      preLoaderRoute: typeof CSlugAccountRouteImport
+      parentRoute: typeof CSlugRoute
+    }
+    '/c/$slug/track': {
+      id: '/c/$slug/track'
+      path: '/track'
+      fullPath: '/c/$slug/track'
+      preLoaderRoute: typeof CSlugTrackRouteImport
+      parentRoute: typeof CSlugRoute
+    }
   }
 }
 
+interface TeamRouteChildren {
+  TeamJoinRoute: typeof TeamJoinRoute
+}
+
+const TeamRouteChildren: TeamRouteChildren = {
+  TeamJoinRoute: TeamJoinRoute,
+}
+
+const TeamRouteWithChildren = TeamRoute._addFileChildren(TeamRouteChildren)
+
+interface CSlugRouteChildren {
+  CSlugAccountRoute: typeof CSlugAccountRoute
+  CSlugTrackRoute: typeof CSlugTrackRoute
+  CSlugIndexRoute: typeof CSlugIndexRoute
+}
+
+const CSlugRouteChildren: CSlugRouteChildren = {
+  CSlugAccountRoute: CSlugAccountRoute,
+  CSlugTrackRoute: CSlugTrackRoute,
+  CSlugIndexRoute: CSlugIndexRoute,
+}
+
+const CSlugRouteWithChildren = CSlugRoute._addFileChildren(CSlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AwaitingPaymentRoute: AwaitingPaymentRoute,
+  ContactsRoute: ContactsRoute,
+  ConversationsRoute: ConversationsRoute,
+  DashboardRoute: DashboardRoute,
+  JoinRoute: JoinRoute,
+  LoginRoute: LoginRoute,
+  OffersRoute: OffersRoute,
+  OrdersRoute: OrdersRoute,
+  ProductsRoute: ProductsRoute,
+  PublishedRoute: PublishedRoute,
+  ShippingRoute: ShippingRoute,
+  TeamRoute: TeamRouteWithChildren,
+  WelcomeRoute: WelcomeRoute,
+  ApiChatAiRoute: ApiChatAiRoute,
+  ApiVisitorRoute: ApiVisitorRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  CSlugRoute: CSlugRouteWithChildren,
+  ChatSlugRoute: ChatSlugRoute,
+  SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsPaymentMethodsRoute: SettingsPaymentMethodsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
