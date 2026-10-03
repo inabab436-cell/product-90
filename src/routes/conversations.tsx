@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowRight, CheckCheck, Search, Send, CreditCard, MessagesSquare } from "lucide-react";
+import { ArrowDown, ArrowRight, CheckCheck, Clock, Search, Send, CreditCard, MessagesSquare } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -182,16 +182,21 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
     refetchInterval: 5000,
   });
 
+  // Messages shown instantly while they are being sent.
+  const [pending, setPending] = useState<Array<{ tempId: string; content: string; created_at: string }>>([]);
+
   const send = useMutation({
-    mutationFn: (content: string) => sendMerchantReply({ data: { id, content } }),
-    onSuccess: () => {
-      setText("");
-      nearBottomRef.current = true;
-      qc.invalidateQueries({ queryKey: ["conversation", id] });
+    mutationFn: (p: { tempId: string; content: string }) => sendMerchantReply({ data: { id, content: p.content } }),
+    onSuccess: async (_r, p) => {
+      await qc.invalidateQueries({ queryKey: ["conversation", id] });
+      setPending((list) => list.filter((x) => x.tempId !== p.tempId));
       qc.invalidateQueries({ queryKey: ["conversations"] });
-      requestAnimationFrame(() => inputRef.current?.focus());
     },
-    onError: (e: any) => toast.error(e?.message || "تعذر إرسال الرسالة"),
+    onError: (e: any, p) => {
+      setPending((list) => list.filter((x) => x.tempId !== p.tempId));
+      setText((t) => t || p.content);
+      toast.error(e?.message || "تعذر إرسال الرسالة");
+    },
   });
 
   const confirm = useMutation({
@@ -244,8 +249,19 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
 
   const submit = () => {
     const v = text.trim();
-    if (v && !send.isPending) send.mutate(v);
+    if (!v) return;
+    const tempId = `tmp-${Date.now()}`;
+    setText("");
+    nearBottomRef.current = true;
+    setPending((list) => [...list, { tempId, content: v, created_at: new Date().toISOString() }]);
+    requestAnimationFrame(() => scrollToEnd(true));
+    send.mutate({ tempId, content: v });
   };
+
+  const all = [
+    ...msgs.map((m) => ({ ...m, sending: false })),
+    ...pending.map((p) => ({ id: p.tempId, role: "assistant", content: p.content, created_at: p.created_at, sending: true })),
+  ];
 
   const name = detail.data ? displayName(detail.data) : "…";
 
@@ -275,9 +291,9 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
         <div ref={scrollRef} onScroll={onScroll} className="chat-wall h-full overflow-y-auto px-3 py-5 md:px-8">
           <div className="mx-auto flex max-w-3xl flex-col">
             {detail.isLoading && <p className="text-center text-sm text-muted-foreground">جارٍ التحميل…</p>}
-            {msgs.map((m, i) => {
+            {all.map((m, i) => {
               const mine = m.role !== "user";
-              const prev = msgs[i - 1];
+              const prev = all[i - 1];
               const newDay = !prev || new Date(prev.created_at).toDateString() !== new Date(m.created_at).toDateString();
               const grouped = !newDay && prev && (prev.role !== "user") === mine;
               return (
@@ -287,16 +303,23 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
                       <span className="chat-meta rounded-full bg-card px-3 py-1 text-xs font-semibold shadow-sm">{dayLabel(m.created_at)}</span>
                     </div>
                   )}
-                  <div className={`flex ${mine ? "justify-start" : "justify-end"} ${grouped ? "mt-1" : "mt-3"}`}>
+                  {/* Physical sides: merchant on the right, customer on the left. */}
+                  <div dir="ltr" className={`flex ${mine ? "justify-end" : "justify-start"} ${grouped ? "mt-1" : "mt-3"}`}>
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 md:max-w-[70%] ${
+                      dir="rtl"
+                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 transition-opacity md:max-w-[70%] ${m.sending ? "opacity-70" : ""} ${
                         mine ? `bubble-out ${grouped ? "" : "rounded-tr-md"}` : `bubble-in ${grouped ? "" : "rounded-tl-md"}`
                       }`}
                     >
                       <p className="chat-text whitespace-pre-wrap break-words">{m.content}</p>
                       <span className="chat-meta mt-0.5 flex items-center justify-end gap-1 text-[11px]">
                         {shortTime(m.created_at)}
-                        {mine && <CheckCheck className="h-3.5 w-3.5" />}
+                        {mine &&
+                          (m.sending ? (
+                            <Clock className="h-3.5 w-3.5 animate-pulse" aria-label="جارٍ الإرسال" />
+                          ) : (
+                            <CheckCheck className="h-3.5 w-3.5" aria-label="تم الإرسال" />
+                          ))}
                       </span>
                     </div>
                   </div>
@@ -329,7 +352,7 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
             placeholder="اكتب ردك للعميل…"
             className="chat-text min-h-10 flex-1 resize-none bg-transparent py-1.5 outline-none placeholder:text-muted-foreground"
           />
-          <Button type="submit" size="icon" disabled={!text.trim() || send.isPending} className="h-10 w-10 shrink-0 rounded-full" aria-label="إرسال">
+          <Button type="submit" size="icon" disabled={!text.trim()} onPointerDown={(e) => e.preventDefault()} onMouseDown={(e) => e.preventDefault()} className="h-10 w-10 shrink-0 rounded-full" aria-label="إرسال">
             <Send className="h-5 w-5 -scale-x-100" />
           </Button>
         </div>
