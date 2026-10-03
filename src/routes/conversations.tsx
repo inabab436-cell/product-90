@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, CheckCheck, Search, Send, CreditCard, MessagesSquare } from "lucide-react";
+import { ArrowDown, ArrowRight, CheckCheck, Search, Send, CreditCard, MessagesSquare } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -77,7 +77,7 @@ function ConversationsPage() {
   const select = (id?: string) => navigate({ search: id ? { c: id } : {} });
 
   return (
-    <div dir="rtl" className="hub flex h-[100dvh] overflow-hidden bg-background">
+    <div dir="rtl" className="hub hub-chat flex h-[100dvh] overflow-hidden bg-background">
       {/* Inbox */}
       <aside className={`${selectedId ? "hidden md:flex" : "flex"} w-full flex-col border-l border-border bg-card md:w-[360px]`}>
         <header className="space-y-3 border-b border-border p-4">
@@ -139,7 +139,7 @@ function InboxRow({ row, active, onClick }: { row: ConversationRow; active: bool
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-3 border-b border-border/60 px-4 py-3 text-right transition-colors ${active ? "bg-primary/10" : "hover:bg-muted/60"}`}
+      className={`flex w-full items-center gap-3 border-b border-border/60 px-4 py-3.5 text-right transition-colors ${active ? "row-active" : "hover:bg-muted/60"}`}
     >
       <Avatar name={name} />
       <span className="min-w-0 flex-1">
@@ -158,10 +158,23 @@ function InboxRow({ row, active, onClick }: { row: ConversationRow; active: bool
   );
 }
 
+function dayLabel(iso: string) {
+  const d = new Date(iso);
+  const today = new Date();
+  const y = new Date();
+  y.setDate(today.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return "اليوم";
+  if (d.toDateString() === y.toDateString()) return "أمس";
+  return d.toLocaleDateString("ar-EG", { weekday: "long", day: "numeric", month: "long" });
+}
+
 function Thread({ id, onBack }: { id: string; onBack: () => void }) {
   const qc = useQueryClient();
   const [text, setText] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const nearBottomRef = useRef(true);
+  const [showJump, setShowJump] = useState(false);
 
   const detail = useQuery({
     queryKey: ["conversation", id],
@@ -173,8 +186,10 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
     mutationFn: (content: string) => sendMerchantReply({ data: { id, content } }),
     onSuccess: () => {
       setText("");
+      nearBottomRef.current = true;
       qc.invalidateQueries({ queryKey: ["conversation", id] });
       qc.invalidateQueries({ queryKey: ["conversations"] });
+      requestAnimationFrame(() => inputRef.current?.focus());
     },
     onError: (e: any) => toast.error(e?.message || "تعذر إرسال الرسالة"),
   });
@@ -195,9 +210,37 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
   });
 
   const msgs = detail.data?.messages ?? [];
+
+  const scrollToEnd = (smooth = false) => {
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+  };
+
+  // Only auto-scroll when the merchant is already reading the latest messages.
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: "end" });
+    if (nearBottomRef.current) scrollToEnd();
+    else setShowJump(true);
   }, [msgs.length]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Auto-grow the textarea.
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
+  }, [text]);
+
+  const onScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    nearBottomRef.current = near;
+    if (near) setShowJump(false);
+  };
 
   const submit = () => {
     const v = text.trim();
@@ -208,14 +251,18 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
 
   return (
     <>
-      <header className="flex items-center gap-3 border-b border-border bg-card px-3 py-2.5">
-        <button onClick={onBack} className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted md:hidden" aria-label="رجوع">
+      <header className="flex items-center gap-3 border-b border-border bg-card px-3 py-3 md:px-5">
+        <button onClick={onBack} className="grid h-10 w-10 place-items-center rounded-full hover:bg-muted md:hidden" aria-label="رجوع">
           <ArrowRight className="h-5 w-5" />
         </button>
         <Avatar name={name} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold">{name}</p>
-          {detail.data?.awaiting_payment && <p className="text-[11px] text-destructive">بانتظار استكمال الدفع</p>}
+          <p className="truncate text-base font-bold">{name}</p>
+          {detail.data?.awaiting_payment ? (
+            <p className="text-xs font-semibold text-destructive">بانتظار استكمال الدفع</p>
+          ) : (
+            <p className="chat-meta text-xs">{msgs.length} رسالة</p>
+          )}
         </div>
         {detail.data?.awaiting_payment && (
           <Button size="sm" onClick={() => confirm.mutate()} disabled={confirm.isPending} className="gap-1.5">
@@ -224,44 +271,69 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
         )}
       </header>
 
-      <div className="flex-1 space-y-1.5 overflow-y-auto bg-muted/40 px-3 py-4">
-        {detail.isLoading && <p className="text-center text-sm text-muted-foreground">جارٍ التحميل…</p>}
-        {msgs.map((m) => {
-          const mine = m.role !== "user";
-          return (
-            <div key={m.id} className={`flex ${mine ? "justify-start" : "justify-end"}`}>
-              <div
-                className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm ${
-                  mine ? "rounded-tr-sm bg-primary text-primary-foreground" : "rounded-tl-sm bg-card text-card-foreground"
-                }`}
-              >
-                <p className="whitespace-pre-wrap break-words">{m.content}</p>
-                <span className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                  {shortTime(m.created_at)}
-                  {mine && <CheckCheck className="h-3 w-3" />}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={endRef} />
+      <div className="relative min-h-0 flex-1">
+        <div ref={scrollRef} onScroll={onScroll} className="chat-wall h-full overflow-y-auto px-3 py-5 md:px-8">
+          <div className="mx-auto flex max-w-3xl flex-col">
+            {detail.isLoading && <p className="text-center text-sm text-muted-foreground">جارٍ التحميل…</p>}
+            {msgs.map((m, i) => {
+              const mine = m.role !== "user";
+              const prev = msgs[i - 1];
+              const newDay = !prev || new Date(prev.created_at).toDateString() !== new Date(m.created_at).toDateString();
+              const grouped = !newDay && prev && (prev.role !== "user") === mine;
+              return (
+                <div key={m.id}>
+                  {newDay && (
+                    <div className="my-4 flex justify-center">
+                      <span className="chat-meta rounded-full bg-card px-3 py-1 text-xs font-semibold shadow-sm">{dayLabel(m.created_at)}</span>
+                    </div>
+                  )}
+                  <div className={`flex ${mine ? "justify-start" : "justify-end"} ${grouped ? "mt-1" : "mt-3"}`}>
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 md:max-w-[70%] ${
+                        mine ? `bubble-out ${grouped ? "" : "rounded-tr-md"}` : `bubble-in ${grouped ? "" : "rounded-tl-md"}`
+                      }`}
+                    >
+                      <p className="chat-text whitespace-pre-wrap break-words">{m.content}</p>
+                      <span className="chat-meta mt-0.5 flex items-center justify-end gap-1 text-[11px]">
+                        {shortTime(m.created_at)}
+                        {mine && <CheckCheck className="h-3.5 w-3.5" />}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        {showJump && (
+          <button
+            onClick={() => { scrollToEnd(true); setShowJump(false); }}
+            className="absolute bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-lg"
+          >
+            <ArrowDown className="h-4 w-4" /> رسائل جديدة
+          </button>
+        )}
       </div>
 
       <form
         onSubmit={(e) => { e.preventDefault(); submit(); }}
-        className="flex items-end gap-2 border-t border-border bg-card p-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
+        className="border-t border-border bg-card px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:px-8"
       >
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); } }}
-          rows={1}
-          placeholder="اكتب رسالة…"
-          className="max-h-32 min-h-11 flex-1 resize-none rounded-3xl bg-muted px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
-        />
-        <Button type="submit" size="icon" disabled={!text.trim() || send.isPending} className="h-11 w-11 shrink-0 rounded-full" aria-label="إرسال">
-          <Send className="h-5 w-5 -scale-x-100" />
-        </Button>
+        <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-3xl border border-border bg-background p-1.5 ps-4 focus-within:border-primary">
+          <textarea
+            ref={inputRef}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); } }}
+            rows={1}
+            placeholder="اكتب ردك للعميل…"
+            className="chat-text min-h-10 flex-1 resize-none bg-transparent py-1.5 outline-none placeholder:text-muted-foreground"
+          />
+          <Button type="submit" size="icon" disabled={!text.trim() || send.isPending} className="h-10 w-10 shrink-0 rounded-full" aria-label="إرسال">
+            <Send className="h-5 w-5 -scale-x-100" />
+          </Button>
+        </div>
+        <p className="chat-meta mx-auto mt-1.5 hidden max-w-3xl text-[11px] md:block">Enter للإرسال · Shift + Enter لسطر جديد</p>
       </form>
     </>
   );

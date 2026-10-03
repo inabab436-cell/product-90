@@ -811,3 +811,24 @@
 .store-chat .hub-card { border-radius: 0; box-shadow: none; border: 1px solid var(--border); }
 .store-chat .hub-display { font-family: "Bebas Neue", "Cairo", sans-serif; letter-spacing: .02em; }
 .store-chat .shadow-card { box-shadow: none; }
+
+/* Merchant conversations page — scoped */
+.hub-chat {
+  --chat-wall: oklch(0.965 0.008 220);
+  --chat-in: var(--hub-paper);
+  --chat-in-fg: var(--hub-ink);
+  --chat-out: oklch(0.93 0.035 205);
+  --chat-out-fg: oklch(0.27 0.05 240);
+  --chat-meta: oklch(0.55 0.02 240);
+  --chat-active: oklch(0.95 0.025 215);
+}
+.hub-chat .chat-wall {
+  background-color: var(--chat-wall);
+  background-image: radial-gradient(oklch(0.25 0.062 251 / 0.035) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.hub-chat .bubble-in { background: var(--chat-in); color: var(--chat-in-fg); box-shadow: 0 1px 1.5px oklch(0.25 0.062 251 / 0.08); }
+.hub-chat .bubble-out { background: var(--chat-out); color: var(--chat-out-fg); box-shadow: 0 1px 1.5px oklch(0.25 0.062 251 / 0.06); }
+.hub-chat .chat-meta { color: var(--chat-meta); }
+.hub-chat .row-active { background: var(--chat-active); box-shadow: inset -3px 0 0 var(--hub-blue); }
+.hub-chat .chat-text { font-size: 15.5px; line-height: 1.75; }
