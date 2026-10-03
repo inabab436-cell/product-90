@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowRight, CheckCheck, Search, Send, CreditCard, MessagesSquare } from "lucide-react";
+import { ArrowDown, ArrowRight, CheckCheck, Clock, Search, Send, CreditCard, MessagesSquare } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -249,8 +249,19 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
 
   const submit = () => {
     const v = text.trim();
-    if (v && !send.isPending) send.mutate(v);
+    if (!v) return;
+    const tempId = `tmp-${Date.now()}`;
+    setText("");
+    nearBottomRef.current = true;
+    setPending((list) => [...list, { tempId, content: v, created_at: new Date().toISOString() }]);
+    requestAnimationFrame(() => scrollToEnd(true));
+    send.mutate({ tempId, content: v });
   };
+
+  const all = [
+    ...msgs.map((m) => ({ ...m, sending: false })),
+    ...pending.map((p) => ({ id: p.tempId, role: "assistant", content: p.content, created_at: p.created_at, sending: true })),
+  ];
 
   const name = detail.data ? displayName(detail.data) : "…";
 
@@ -280,9 +291,9 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
         <div ref={scrollRef} onScroll={onScroll} className="chat-wall h-full overflow-y-auto px-3 py-5 md:px-8">
           <div className="mx-auto flex max-w-3xl flex-col">
             {detail.isLoading && <p className="text-center text-sm text-muted-foreground">جارٍ التحميل…</p>}
-            {msgs.map((m, i) => {
+            {all.map((m, i) => {
               const mine = m.role !== "user";
-              const prev = msgs[i - 1];
+              const prev = all[i - 1];
               const newDay = !prev || new Date(prev.created_at).toDateString() !== new Date(m.created_at).toDateString();
               const grouped = !newDay && prev && (prev.role !== "user") === mine;
               return (
@@ -292,16 +303,23 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
                       <span className="chat-meta rounded-full bg-card px-3 py-1 text-xs font-semibold shadow-sm">{dayLabel(m.created_at)}</span>
                     </div>
                   )}
-                  <div className={`flex ${mine ? "justify-start" : "justify-end"} ${grouped ? "mt-1" : "mt-3"}`}>
+                  {/* Physical sides: merchant on the right, customer on the left. */}
+                  <div dir="ltr" className={`flex ${mine ? "justify-end" : "justify-start"} ${grouped ? "mt-1" : "mt-3"}`}>
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 md:max-w-[70%] ${
+                      dir="rtl"
+                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 transition-opacity md:max-w-[70%] ${m.sending ? "opacity-70" : ""} ${
                         mine ? `bubble-out ${grouped ? "" : "rounded-tr-md"}` : `bubble-in ${grouped ? "" : "rounded-tl-md"}`
                       }`}
                     >
                       <p className="chat-text whitespace-pre-wrap break-words">{m.content}</p>
                       <span className="chat-meta mt-0.5 flex items-center justify-end gap-1 text-[11px]">
                         {shortTime(m.created_at)}
-                        {mine && <CheckCheck className="h-3.5 w-3.5" />}
+                        {mine &&
+                          (m.sending ? (
+                            <Clock className="h-3.5 w-3.5 animate-pulse" aria-label="جارٍ الإرسال" />
+                          ) : (
+                            <CheckCheck className="h-3.5 w-3.5" aria-label="تم الإرسال" />
+                          ))}
                       </span>
                     </div>
                   </div>
