@@ -352,7 +352,7 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
             placeholder="اكتب ردك للعميل…"
             className="chat-text min-h-10 flex-1 resize-none bg-transparent py-1.5 outline-none placeholder:text-muted-foreground"
           />
-          <Button type="submit" size="icon" disabled={!text.trim() || send.isPending} className="h-10 w-10 shrink-0 rounded-full" aria-label="إرسال">
+          <Button type="submit" size="icon" disabled={!text.trim()} onPointerDown={(e) => e.preventDefault()} onMouseDown={(e) => e.preventDefault()} className="h-10 w-10 shrink-0 rounded-full" aria-label="إرسال">
             <Send className="h-5 w-5 -scale-x-100" />
           </Button>
         </div>
