@@ -182,16 +182,21 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
     refetchInterval: 5000,
   });
 
+  // Messages shown instantly while they are being sent.
+  const [pending, setPending] = useState<Array<{ tempId: string; content: string; created_at: string }>>([]);
+
   const send = useMutation({
-    mutationFn: (content: string) => sendMerchantReply({ data: { id, content } }),
-    onSuccess: () => {
-      setText("");
-      nearBottomRef.current = true;
-      qc.invalidateQueries({ queryKey: ["conversation", id] });
+    mutationFn: (p: { tempId: string; content: string }) => sendMerchantReply({ data: { id, content: p.content } }),
+    onSuccess: async (_r, p) => {
+      await qc.invalidateQueries({ queryKey: ["conversation", id] });
+      setPending((list) => list.filter((x) => x.tempId !== p.tempId));
       qc.invalidateQueries({ queryKey: ["conversations"] });
-      requestAnimationFrame(() => inputRef.current?.focus());
     },
-    onError: (e: any) => toast.error(e?.message || "تعذر إرسال الرسالة"),
+    onError: (e: any, p) => {
+      setPending((list) => list.filter((x) => x.tempId !== p.tempId));
+      setText((t) => t || p.content);
+      toast.error(e?.message || "تعذر إرسال الرسالة");
+    },
   });
 
   const confirm = useMutation({
